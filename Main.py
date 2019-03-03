@@ -66,5 +66,22 @@ x = daily_rentals['hr']
 y = daily_rentals['cnt']
 h = daily_rentals['weekday']
 sns_plt = sns.lineplot(x=x, y=y, hue = h, data = daily_rentals, palette='rainbow')
-plt.show()
 ## 0 and 6 are Sunday and Saturday respectively. This plot shows the difference in rental behavior during workdays and weekends
+plt.show()
+
+## Rentals with respect to temperature
+## Temperature is normalized between 0 and 1
+x = train_data['temp']
+y = train_data['cnt']
+sns.lineplot(x=x, y=y, data=train_data)
+plt.show()
+## Shows that around temp=0.68 there is a huge increase in rentals
+
+## Plot of amount of rentals with respect to the temperature PER season
+daily_rentals = pd.DataFrame(train_data.groupby(['temp', 'season'], sort = True)['cnt'].mean()).reset_index()
+x = daily_rentals['temp']
+y = daily_rentals['cnt']
+h = daily_rentals['season']
+sns_plt = sns.lineplot(x=x, y=y, hue = h, data = daily_rentals, palette='rainbow')
+plt.show()
+## Not sure if this one is useful
