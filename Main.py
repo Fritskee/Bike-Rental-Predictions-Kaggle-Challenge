@@ -34,7 +34,7 @@ print(train_data.isna().sum()) #Check if we have any missing values
 plt.title('Distribution of seasons')
 plt.xlabel('Season')
 plt.ylabel('Renting')
-train_data['season'].hist(bins=8) #I put 8 bins to have a nice spacing between each season
+train_data['season'].hist(bins=7) #I put 8 bins to have a nice spacing between each season
 plt.show()
 ## Seems like 2 and 3 (summer and fall) are the most popular seasons
 
@@ -42,7 +42,7 @@ plt.show()
 plt.title('Distribution of weather')
 plt.xlabel('Weather')
 plt.ylabel('Renting')
-train_data['weathersit'].hist(bins=8) #I put 8 bins to have a nice spacing between each season
+train_data['weathersit'].hist(bins=7) #I put 8 bins to have a nice spacing between each season
 plt.show()
 ## Seems like Clear weather is by far superior
 
