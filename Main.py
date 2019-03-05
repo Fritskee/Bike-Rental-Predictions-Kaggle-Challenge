@@ -5,6 +5,7 @@ import pandas as pd
 import sklearn as sk
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
@@ -95,35 +96,35 @@ print(train_data.isna().sum()) #Check if we have any missing values
 # ### Setting up Linear Regression
 output_data = train_data.loc[:, 'cnt']
 input_data = train_data.drop(['cnt'], axis=1)
-print("y data: ", output_data.shape)
-print("x data: ", input_data.shape)
-
-lin_reg = LinearRegression().fit(input_data, output_data)
-prediction = lin_reg.predict(test_data)
-print("prediction", prediction.shape)
-
-### Setting up the output doc
-id_column = [x for x in range(1, 4345)]
-cnt_column = ['cnt']
-prediction_df = pd.DataFrame(index=id_column, columns=cnt_column)
-prediction_df.columns.name = 'Id'
-prediction_df['cnt'] = [int(pred) for pred in prediction]
-
-# to make sure each value is 0 or higher
-prediction_df = prediction_df.clip(lower = 0)
-
-# print("prediction df")
-# print(prediction_df.head())
-
-### Putting everything in the output file
-prediction_df.to_csv('./output.csv', index_label='Id')
-
-###########################################################################
-
-
-############################### Random Forest ############################################
-forest_reg = RandomForestRegressor(n_estimators=100, max_depth=None,
-min_samples_split=2, n_jobs=-1, oob_score=False, warm_start=True)
+# print("y data: ", output_data.shape)
+# print("x data: ", input_data.shape)
+#
+# lin_reg = LinearRegression().fit(input_data, output_data)
+# prediction = lin_reg.predict(test_data)
+# print("prediction", prediction.shape)
+#
+# ### Setting up the output doc
+# id_column = [x for x in range(1, 4345)]
+# cnt_column = ['cnt']
+# prediction_df = pd.DataFrame(index=id_column, columns=cnt_column)
+# prediction_df.columns.name = 'Id'
+# prediction_df['cnt'] = [int(pred) for pred in prediction]
+#
+# # to make sure each value is 0 or higher
+# prediction_df = prediction_df.clip(lower = 0)
+#
+# # print("prediction df")
+# # print(prediction_df.head())
+#
+# ### Putting everything in the output file
+# prediction_df.to_csv('./output.csv', index_label='Id')
+#
+# ###########################################################################
+#
+#
+# ############################### Random Forest ############################################
+forest_reg = RandomForestRegressor(max_depth=17, max_features=0.9, min_samples_split=4, n_estimators=250, n_jobs=-1,
+           oob_score=True, random_state=42, warm_start=True)
 
 forest_reg.fit(input_data, output_data)
 forest_pred = forest_reg.predict(test_data)
@@ -143,3 +144,44 @@ forest_df = forest_df.clip(lower = 0)
 forest_df.to_csv('./output2.csv', index_label='Id')
 
 ###########################################################################
+
+############################### Gradient Boosting Classifier ############################################
+# grad_boost = GradientBoostingClassifier(criterion='mse')
+#
+# grad_boost.fit(input_data, output_data)
+# grad_pred = grad_boost.predict(test_data)
+# print("Gradient Boosting: ", grad_boost.shape)
+#
+# id_column = [x for x in range(1, 4345)]
+# cnt_column = ['cnt']
+# gradient_df = pd.DataFrame(index=id_column, columns=cnt_column)
+# gradient_df.columns.name = 'Id'
+# gradient_df['cnt'] = [int(pred) for pred in grad_pred]
+#
+# # to make sure each value is 0 or higher
+# gradient_df = gradient_df.clip(lower = 0)
+#
+# ### Putting everything in the output file
+# gradient_df.to_csv('./output3.csv', index_label='Id')
+###########################################################################
+
+
+#################################### GRADIENT BOOSTING - BEST RESULT ########################################
+# from sklearn.ensemble import GradientBoostingRegressor
+#
+# gbm = GradientBoostingRegressor(n_estimators=4000,alpha=0.01); ### Test 0.41
+# yLabelsLog = np.log1p(output_data)
+# gbm.fit(input_data, output_data)
+# preds = gbm.predict(X= test_data)
+#
+# id_column = [x for x in range(1, 4345)]
+# cnt_column = ['cnt']
+# gradient_df = pd.DataFrame(index=id_column, columns=cnt_column)
+# gradient_df.columns.name = 'Id'
+# gradient_df['cnt'] = [int(pred) for pred in preds]
+#
+# # to make sure each value is 0 or higher
+# gradient_df = gradient_df.clip(lower = 0)
+#
+# ### Putting everything in the output file
+# gradient_df.to_csv('./output3.csv', index_label='Id')
