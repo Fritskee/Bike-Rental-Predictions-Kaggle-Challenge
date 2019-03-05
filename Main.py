@@ -92,15 +92,24 @@ print(train_data.isna().sum()) #Check if we have any missing values
 
 
 ### Setting up the model
-y_data = train_data.loc[:, 'cnt']
-x_data = train_data.drop(['cnt'], axis=1)
+output_data = train_data.loc[:, 'cnt']
+input_data = train_data.drop(['cnt'], axis=1)
+print("y data: ", output_data.shape)
+print("x data: ", input_data.shape)
 
-print("y data: ", y_data.shape)
-print("x data: ", x_data.shape)
-
-lin_reg = LinearRegression().fit(x_data, y_data)
+lin_reg = LinearRegression().fit(input_data, output_data)
 prediction = lin_reg.predict(test_data)
-
 print("prediction", prediction.shape)
 
-# rmse = mean_squared_error(train_data, test_data)
+### Setting up the output doc
+id_column = [x for x in range(1, 4345)]
+cnt_column = ['cnt']
+prediction_df = pd.DataFrame(index=id_column, columns=cnt_column)
+prediction_df.columns.name = 'Id'
+prediction_df['cnt'] = [pred for pred in prediction]
+
+print("prediction df")
+print(prediction_df.head())
+
+prediction_df.to_csv('./output.csv')
+
