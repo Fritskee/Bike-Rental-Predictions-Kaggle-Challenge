@@ -127,11 +127,8 @@ max_leaf_nodes=None, min_impurity_decrease=0.0, min_impurity_split=None, min_sam
 min_samples_split=2, min_weight_fraction_leaf=0.0, n_estimators=150, n_jobs=1, oob_score=False,
 random_state=None, verbose=0, warm_start=False)
 
-# Fit the model on X_train and y_train
 forest_reg.fit(input_data, output_data)
-# Predict on X_test and register the log of the prediction
 forest_pred = forest_reg.predict(test_data)
-
 print("random forest: ", forest_pred.shape)
 
 ### Setting up the output doc
