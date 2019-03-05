@@ -89,24 +89,67 @@ print(train_data.isna().sum()) #Check if we have any missing values
 # plt.show()
 # ## Not sure if this one is useful
 
+############################### LINEAR REGRESSION ############################################
 
-### Setting up Linear Regression
+# ### Setting up Linear Regression
 output_data = train_data.loc[:, 'cnt']
 input_data = train_data.drop(['cnt'], axis=1)
-print("y data: ", output_data.shape)
-print("x data: ", input_data.shape)
+# print("y data: ", output_data.shape)
+# print("x data: ", input_data.shape)
+#
+# lin_reg = LinearRegression().fit(input_data, output_data)
+# prediction = lin_reg.predict(test_data)
+# print("prediction", prediction.shape)
+#
+# ### Setting up the output doc
+# id_column = [x for x in range(1, 4345)]
+# cnt_column = ['cnt']
+# prediction_df = pd.DataFrame(index=id_column, columns=cnt_column)
+# prediction_df.columns.name = 'Id'
+# prediction_df['cnt'] = [int(pred) for pred in prediction]
+#
+# # to make sure each value is 0 or higher
+# prediction_df = prediction_df.clip(lower = 0)
+#
+# # print("prediction df")
+# # print(prediction_df.head())
+#
+# ### Putting everything in the output file
+# prediction_df.to_csv('./output2.csv', index_label='Id')
 
-lin_reg = LinearRegression().fit(input_data, output_data)
-prediction = lin_reg.predict(test_data)
-print("prediction", prediction.shape)
+###########################################################################
+
+
+############################### Random Forest ############################################
+
+df_test = pd.read_csv('./test.csv')
+df_test.shape
+df_test.head()
+# df_test['datetime'] = pd.to_datetime(df_test['datetime'])
+# df_test_clear = df_test.drop(['datetime'], axis=1)
+df_test.sample(10)
+X_test_2 = df_test.drop(['mnth', 'hr'], axis=1)
+X_test_2.head()
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import accuracy_score
+# Create a RandomForestRegressor model
+rf = RandomForestRegressor(bootstrap=True, criterion='mse', max_depth=10, max_features='auto',
+max_leaf_nodes=None, min_impurity_decrease=0.0, min_impurity_split=None, min_samples_leaf=1,
+min_samples_split=2, min_weight_fraction_leaf=0.0, n_estimators=150, n_jobs=1, oob_score=False,
+random_state=None, verbose=0, warm_start=False)
+# Fit the model on X_train and y_train
+rf.fit(input_data, output_data)
+# Predict on X_test and register the log of the prediction
+log_pred = rf.predict(test_data)
+
+print("prediction", log_pred.shape)
 
 ### Setting up the output doc
 id_column = [x for x in range(1, 4345)]
 cnt_column = ['cnt']
 prediction_df = pd.DataFrame(index=id_column, columns=cnt_column)
 prediction_df.columns.name = 'Id'
-prediction_df['cnt'] = [int(pred) for pred in prediction]
-
+prediction_df['cnt'] = [int(pred) for pred in log_pred]
 # to make sure each value is 0 or higher
 prediction_df = prediction_df.clip(lower = 0)
 
@@ -114,5 +157,6 @@ prediction_df = prediction_df.clip(lower = 0)
 # print(prediction_df.head())
 
 ### Putting everything in the output file
-prediction_df.to_csv('./output.csv', index_label='Id')
+prediction_df.to_csv('./output2.csv', index_label='Id')
 
+###########################################################################
