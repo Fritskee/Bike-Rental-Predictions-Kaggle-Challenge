@@ -85,3 +85,4 @@ h = daily_rentals['season']
 sns_plt = sns.lineplot(x=x, y=y, hue = h, data = daily_rentals, palette='rainbow')
 plt.show()
 ## Not sure if this one is useful
+
