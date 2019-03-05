@@ -3,6 +3,10 @@ import pandas as pd
 import scipy as sp
 import pandas as pd
 import sklearn as sk
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold
 import matplotlib as mpl
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
@@ -30,59 +34,73 @@ print(train_data.isna().sum()) #Check if we have any missing values
 # cnt - number of total rentals
 
 ### Understanding the data:
-## Seasons
-plt.title('Distribution of seasons')
-plt.xlabel('Season')
-plt.ylabel('Renting')
-train_data['season'].hist(bins=7) #I put 8 bins to have a nice spacing between each season
-plt.show()
-## Seems like 2 and 3 (summer and fall) are the most popular seasons
+# ## Seasons
+# plt.title('Distribution of seasons')
+# plt.xlabel('Season')
+# plt.ylabel('Renting')
+# train_data['season'].hist(bins=7) #I put 8 bins to have a nice spacing between each season
+# plt.show()
+# ## Seems like 2 and 3 (summer and fall) are the most popular seasons
+#
+# ## Weather
+# plt.title('Distribution of weather')
+# plt.xlabel('Weather')
+# plt.ylabel('Renting')
+# train_data['weathersit'].hist(bins=7) #I put 8 bins to have a nice spacing between each season
+# plt.show()
+# ## Seems like Clear weather is by far superior
+#
+# ## Hourly
+# x = train_data['hr']
+# y = train_data['cnt']
+# sns.barplot(x=x, y=y, palette='pastel')
+# plt.show()
+# ## Around 8h00 and 17h00 - 18h00 it's peak moment
+#
+# ## Daily
+# x = train_data['weekday']
+# y = train_data['cnt']
+# sns.barplot(x=x, y=y, palette='pastel')
+# plt.show()
+# ## Amount of bikes rented is pretty consistent per day
+#
+# ## Rentals Per hour Per day
+# daily_rentals = pd.DataFrame(train_data.groupby(['hr', 'weekday'], sort = True)['cnt'].mean()).reset_index()
+# x = daily_rentals['hr']
+# y = daily_rentals['cnt']
+# h = daily_rentals['weekday']
+# sns_plt = sns.lineplot(x=x, y=y, hue = h, data = daily_rentals, palette='rainbow')
+# ## 0 and 6 are Sunday and Saturday respectively. This plot shows the difference in rental behavior during workdays and weekends
+# plt.show()
+#
+# ## Rentals with respect to temperature
+# ## Temperature is normalized between 0 and 1
+# x = train_data['temp']
+# y = train_data['cnt']
+# sns.lineplot(x=x, y=y, data=train_data)
+# plt.show()
+# ## Shows that around temp=0.68 there is a huge increase in rentals
+#
+# ## Plot of amount of rentals with respect to the temperature PER season
+# daily_rentals = pd.DataFrame(train_data.groupby(['temp', 'season'], sort = True)['cnt'].mean()).reset_index()
+# x = daily_rentals['temp']
+# y = daily_rentals['cnt']
+# h = daily_rentals['season']
+# sns_plt = sns.lineplot(x=x, y=y, hue = h, data = daily_rentals, palette='rainbow')
+# plt.show()
+# ## Not sure if this one is useful
 
-## Weather
-plt.title('Distribution of weather')
-plt.xlabel('Weather')
-plt.ylabel('Renting')
-train_data['weathersit'].hist(bins=7) #I put 8 bins to have a nice spacing between each season
-plt.show()
-## Seems like Clear weather is by far superior
 
-## Hourly
-x = train_data['hr']
-y = train_data['cnt']
-sns.barplot(x=x, y=y, palette='pastel')
-plt.show()
-## Around 8h00 and 17h00 - 18h00 it's peak moment
+### Setting up the model
+y_data = train_data.loc[:, 'cnt']
+x_data = train_data.drop(['cnt'], axis=1)
 
-## Daily
-x = train_data['weekday']
-y = train_data['cnt']
-sns.barplot(x=x, y=y, palette='pastel')
-plt.show()
-## Amount of bikes rented is pretty consistent per day
+print("y data: ", y_data.shape)
+print("x data: ", x_data.shape)
 
-## Rentals Per hour Per day
-daily_rentals = pd.DataFrame(train_data.groupby(['hr', 'weekday'], sort = True)['cnt'].mean()).reset_index()
-x = daily_rentals['hr']
-y = daily_rentals['cnt']
-h = daily_rentals['weekday']
-sns_plt = sns.lineplot(x=x, y=y, hue = h, data = daily_rentals, palette='rainbow')
-## 0 and 6 are Sunday and Saturday respectively. This plot shows the difference in rental behavior during workdays and weekends
-plt.show()
+lin_reg = LinearRegression().fit(x_data, y_data)
+prediction = lin_reg.predict(test_data)
 
-## Rentals with respect to temperature
-## Temperature is normalized between 0 and 1
-x = train_data['temp']
-y = train_data['cnt']
-sns.lineplot(x=x, y=y, data=train_data)
-plt.show()
-## Shows that around temp=0.68 there is a huge increase in rentals
+print("prediction", prediction.shape)
 
-## Plot of amount of rentals with respect to the temperature PER season
-daily_rentals = pd.DataFrame(train_data.groupby(['temp', 'season'], sort = True)['cnt'].mean()).reset_index()
-x = daily_rentals['temp']
-y = daily_rentals['cnt']
-h = daily_rentals['season']
-sns_plt = sns.lineplot(x=x, y=y, hue = h, data = daily_rentals, palette='rainbow')
-plt.show()
-## Not sure if this one is useful
-
+# rmse = mean_squared_error(train_data, test_data)
