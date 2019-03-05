@@ -122,10 +122,8 @@ prediction_df.to_csv('./output.csv', index_label='Id')
 
 
 ############################### Random Forest ############################################
-forest_reg = RandomForestRegressor(bootstrap=True, criterion='mse', max_depth=10, max_features='auto',
-max_leaf_nodes=None, min_impurity_decrease=0.0, min_impurity_split=None, min_samples_leaf=1,
-min_samples_split=2, min_weight_fraction_leaf=0.0, n_estimators=150, n_jobs=1, oob_score=False,
-random_state=None, verbose=0, warm_start=False)
+forest_reg = RandomForestRegressor(n_estimators=100, max_depth=None,
+min_samples_split=2, n_jobs=-1, oob_score=False, warm_start=True)
 
 forest_reg.fit(input_data, output_data)
 forest_pred = forest_reg.predict(test_data)
@@ -142,6 +140,6 @@ forest_df['cnt'] = [int(pred) for pred in forest_pred]
 forest_df = forest_df.clip(lower = 0)
 
 ### Putting everything in the output file
-forest_df.to_csv('./output2.csv', index_label='Id')
+forest_df.to_csv('./output5.csv', index_label='Id')
 
 ###########################################################################
