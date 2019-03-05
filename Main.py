@@ -106,10 +106,13 @@ id_column = [x for x in range(1, 4345)]
 cnt_column = ['cnt']
 prediction_df = pd.DataFrame(index=id_column, columns=cnt_column)
 prediction_df.columns.name = 'Id'
-prediction_df['cnt'] = [pred for pred in prediction]
+prediction_df['cnt'] = [int(pred) for pred in prediction]
+
+# to make sure each value is 0 or higher
+prediction_df = prediction_df.clip(lower = 0)
 
 print("prediction df")
 print(prediction_df.head())
 
-prediction_df.to_csv('./output.csv')
+prediction_df.to_csv('./output.csv', index_label='Id')
 
