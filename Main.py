@@ -11,7 +11,6 @@ import matplotlib as mpl
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import seaborn as sns
-import calendar
 
 train_data = pd.read_csv("./train.csv")
 test_data = pd.read_csv("./test.csv")
@@ -91,7 +90,7 @@ print(train_data.isna().sum()) #Check if we have any missing values
 # ## Not sure if this one is useful
 
 
-### Setting up the model
+### Setting up Linear Regression
 output_data = train_data.loc[:, 'cnt']
 input_data = train_data.drop(['cnt'], axis=1)
 print("y data: ", output_data.shape)
@@ -111,8 +110,9 @@ prediction_df['cnt'] = [int(pred) for pred in prediction]
 # to make sure each value is 0 or higher
 prediction_df = prediction_df.clip(lower = 0)
 
-print("prediction df")
-print(prediction_df.head())
+# print("prediction df")
+# print(prediction_df.head())
 
+### Putting everything in the output file
 prediction_df.to_csv('./output.csv', index_label='Id')
 
