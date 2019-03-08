@@ -6,6 +6,7 @@ import sklearn as sk
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.neural_network import MLPRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
@@ -146,21 +147,45 @@ input_data = train_data.drop(['cnt'], axis=1)
 ###########################################################################
 
 #################################### GRADIENT BOOSTING REGRESSOR - BEST RESULT ########################################
-grad_boost = GradientBoostingRegressor(n_estimators=4000,alpha=0.01)
-
-grad_boost.fit(input_data, output_data)
-grad_pred = grad_boost.predict(test_data)
-
-id_column = [x for x in range(1, 4345)]
-cnt_column = ['cnt']
-gradient_df = pd.DataFrame(index=id_column, columns=cnt_column)
-gradient_df.columns.name = 'Id'
-gradient_df['cnt'] = [int(pred) for pred in grad_pred]
-
-# to make sure each value is 0 or higher
-gradient_df = gradient_df.clip(lower = 0)
-
-### Putting everything in the output file
-gradient_df.to_csv('./output3.csv', index_label='Id')
+# grad_boost = GradientBoostingRegressor(n_estimators=4000,alpha=0.01)
+#
+# grad_boost.fit(input_data, output_data)
+# grad_pred = grad_boost.predict(test_data)
+#
+# id_column = [x for x in range(1, 4345)]
+# cnt_column = ['cnt']
+# gradient_df = pd.DataFrame(index=id_column, columns=cnt_column)
+# gradient_df.columns.name = 'Id'
+# gradient_df['cnt'] = [int(pred) for pred in grad_pred]
+#
+# # to make sure each value is 0 or higher
+# gradient_df = gradient_df.clip(lower = 0)
+#
+# ### Putting everything in the output file
+# gradient_df.to_csv('./output3.csv', index_label='Id')
 
 ###########################################################################
+
+#################################### Neural network - shit results  ########################################
+# nn_class = MLPRegressor(hidden_layer_sizes=(100,),  activation='relu', solver='adam', alpha=0.001, batch_size='auto',
+#     learning_rate='constant', learning_rate_init=0.01, power_t=0.5, max_iter=10000, shuffle=True,
+#     random_state=0, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True,
+#     early_stopping=False, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
+#
+# nn_class.fit(input_data, output_data)
+# nn_pred = nn_class.predict(test_data)
+#
+# id_column = [x for x in range(1, 4345)]
+# cnt_column = ['cnt']
+# nn_df = pd.DataFrame(index=id_column, columns=cnt_column)
+# nn_df.columns.name = 'Id'
+# nn_df['cnt'] = [int(pred) for pred in nn_pred]
+#
+# # to make sure each value is 0 or higher
+# nn_df = nn_df.clip(lower = 0)
+#
+# ### Putting everything in the output file
+# nn_df.to_csv('./output4.csv', index_label='Id')
+###########################################################################
+
+#################################### Isotonic regression  ########################################
