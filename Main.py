@@ -191,7 +191,7 @@ result_df['cnt'] = [int(f) for f in fresh]
 
 result_df = result_df.clip(lower = 0)
 result_df.to_csv('./output3_combo.csv', index_label='Id')
-###########################################################################
+############################################################################
 
 #################################### Neural network - shit results  ########################################
 # nn_class = MLPRegressor(hidden_layer_sizes=(100,),  activation='relu', solver='adam', alpha=0.001, batch_size='auto',
