@@ -124,7 +124,7 @@ input_data = train_data.drop(['cnt'], axis=1)
 # ###########################################################################
 #
 #
-# ############################### Random Forest ############################################
+# ############################### Random Forest - GOOD RESULTS WITH THIS TUNE (close to gradient boosting) ##########################
 
 forest_reg = RandomForestRegressor(max_depth=17, max_features=0.9, min_samples_split=4, n_estimators=250, n_jobs=-1,
            oob_score=True, random_state=42, warm_start=True)
@@ -148,7 +148,7 @@ forest_df.to_csv('./output2.csv', index_label='Id')
 
 ###########################################################################
 
-#################################### GRADIENT BOOSTING REGRESSOR - BEST RESULT ########################################
+#################################### GRADIENT BOOSTING REGRESSOR - BEST CLASSIFIER ########################################
 input_data = input_data.drop(['atemp'], axis=1)
 test_data = test_data.drop(['atemp'], axis=1)
 grad_boost = GradientBoostingRegressor(n_estimators=12000,alpha=0.01, max_features=6, warm_start=True)
@@ -166,12 +166,7 @@ gradient_df['cnt'] = [int(pred) for pred in grad_pred]
 gradient_df = gradient_df.clip(lower = 0)
 gradient_df.to_csv('./output3.csv', index_label='Id')
 
-### TRIED JUST ADDING OR SUBTRACTING 5 TO THE PREDICTION, BUT DOENS'T YIELD BETTER RESULTS
-# gradient_df['cnt'] = [int(pred-5) for pred in grad_pred]
-# gradient_df = gradient_df.clip(lower = 0)
-# ### Putting everything in the output file
-# gradient_df.to_csv('./output3_plus.csv', index_label='Id')
-####
+#################################### COMBINING OUR BEST CLASSIFIERS ########################################
 
 result_df = pd.DataFrame(index=id_column, columns=cnt_column)
 # result_df['cnt'] = [int(pred) for pred in grad_pred]
