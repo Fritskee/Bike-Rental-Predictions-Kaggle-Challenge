@@ -7,6 +7,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.neural_network import MLPRegressor
+from sklearn.isotonic import IsotonicRegression
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
@@ -124,46 +125,77 @@ input_data = train_data.drop(['cnt'], axis=1)
 #
 #
 # ############################### Random Forest ############################################
-# forest_reg = RandomForestRegressor(max_depth=17, max_features=0.9, min_samples_split=4, n_estimators=250, n_jobs=-1,
-#            oob_score=True, random_state=42, warm_start=True)
-#
-# forest_reg.fit(input_data, output_data)
-# forest_pred = forest_reg.predict(test_data)
-# print("random forest: ", forest_pred.shape)
-#
-# ### Setting up the output doc
-# id_column = [x for x in range(1, 4345)]
-# cnt_column = ['cnt']
-# forest_df = pd.DataFrame(index=id_column, columns=cnt_column)
-# forest_df.columns.name = 'Id'
-# forest_df['cnt'] = [int(pred) for pred in forest_pred]
-#
-# # to make sure each value is 0 or higher
-# forest_df = forest_df.clip(lower = 0)
-#
-# ### Putting everything in the output file
-# forest_df.to_csv('./output2.csv', index_label='Id')
+
+forest_reg = RandomForestRegressor(max_depth=17, max_features=0.9, min_samples_split=4, n_estimators=250, n_jobs=-1,
+           oob_score=True, random_state=42, warm_start=True)
+
+forest_reg.fit(input_data, output_data)
+forest_pred = forest_reg.predict(test_data)
+print("random forest: ", forest_pred.shape)
+
+### Setting up the output doc
+id_column = [x for x in range(1, 4345)]
+cnt_column = ['cnt']
+forest_df = pd.DataFrame(index=id_column, columns=cnt_column)
+forest_df.columns.name = 'Id'
+forest_df['cnt'] = [int(pred) for pred in forest_pred]
+
+# to make sure each value is 0 or higher
+forest_df = forest_df.clip(lower = 0)
+
+### Putting everything in the output file
+forest_df.to_csv('./output2.csv', index_label='Id')
 
 ###########################################################################
 
 #################################### GRADIENT BOOSTING REGRESSOR - BEST RESULT ########################################
-# grad_boost = GradientBoostingRegressor(n_estimators=4000,alpha=0.01)
-#
-# grad_boost.fit(input_data, output_data)
-# grad_pred = grad_boost.predict(test_data)
-#
-# id_column = [x for x in range(1, 4345)]
-# cnt_column = ['cnt']
-# gradient_df = pd.DataFrame(index=id_column, columns=cnt_column)
-# gradient_df.columns.name = 'Id'
-# gradient_df['cnt'] = [int(pred) for pred in grad_pred]
-#
-# # to make sure each value is 0 or higher
-# gradient_df = gradient_df.clip(lower = 0)
-#
-# ### Putting everything in the output file
-# gradient_df.to_csv('./output3.csv', index_label='Id')
+input_data = input_data.drop(['atemp'], axis=1)
+test_data = test_data.drop(['atemp'], axis=1)
+grad_boost = GradientBoostingRegressor(n_estimators=12000,alpha=0.01, max_features=6, warm_start=True)
 
+grad_boost.fit(input_data, output_data)
+grad_pred = grad_boost.predict(test_data)
+
+id_column = [x for x in range(1, 4345)]
+cnt_column = ['cnt']
+gradient_df = pd.DataFrame(index=id_column, columns=cnt_column)
+gradient_df.columns.name = 'Id'
+gradient_df['cnt'] = [int(pred) for pred in grad_pred]
+
+# to make sure each value is 0 or higher
+gradient_df = gradient_df.clip(lower = 0)
+gradient_df.to_csv('./output3.csv', index_label='Id')
+
+### TRIED JUST ADDING OR SUBTRACTING 5 TO THE PREDICTION, BUT DOENS'T YIELD BETTER RESULTS
+# gradient_df['cnt'] = [int(pred-5) for pred in grad_pred]
+# gradient_df = gradient_df.clip(lower = 0)
+# ### Putting everything in the output file
+# gradient_df.to_csv('./output3_plus.csv', index_label='Id')
+####
+
+result_df = pd.DataFrame(index=id_column, columns=cnt_column)
+# result_df['cnt'] = [int(pred) for pred in grad_pred]
+result_df = result_df.clip(lower = 0)
+result_df.columns.name = 'Id'
+result_pred = grad_pred
+
+fresh = []
+
+for i in range (len(grad_pred)):
+    if grad_pred[i]/(grad_pred[i]+forest_pred[i]) > 0.2 and grad_pred[i]/(grad_pred[i]+forest_pred[i]) < 0.8:
+        fresh.append((grad_pred[i]+forest_pred[i])/2)
+    elif grad_pred[i]/(grad_pred[i]+forest_pred[i]) > 0.8:
+        fresh.append((grad_pred[i] + forest_pred[i])/2.4)
+    elif grad_pred[i]/(grad_pred[i]+forest_pred[i]) < 0.2:
+        fresh.append((grad_pred[i] + forest_pred[i]) / 1.6)
+    else:
+        fresh.append(grad_pred[i])
+
+print("length of results is: ", len(fresh))
+result_df['cnt'] = [int(f) for f in fresh]
+
+result_df = result_df.clip(lower = 0)
+result_df.to_csv('./output3_combo.csv', index_label='Id')
 ###########################################################################
 
 #################################### Neural network - shit results  ########################################
@@ -187,5 +219,3 @@ input_data = train_data.drop(['cnt'], axis=1)
 # ### Putting everything in the output file
 # nn_df.to_csv('./output4.csv', index_label='Id')
 ###########################################################################
-
-#################################### Isotonic regression  ########################################
