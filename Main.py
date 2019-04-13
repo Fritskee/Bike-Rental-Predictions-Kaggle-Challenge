@@ -98,6 +98,7 @@ print(train_data.isna().sum()) #Check if we have any missing values
 # ### Setting up Linear Regression
 output_data = train_data.loc[:, 'cnt']
 input_data = train_data.drop(['cnt'], axis=1)
+# test_data = test_data.drop(['weekday', 'atemp'], axis=1)
 # print("y data: ", output_data.shape)
 # print("x data: ", input_data.shape)
 #
@@ -126,8 +127,8 @@ input_data = train_data.drop(['cnt'], axis=1)
 #
 # ############################### Random Forest - GOOD RESULTS WITH THIS TUNE (close to gradient boosting) ##########################
 
-forest_reg = RandomForestRegressor(max_depth=17, max_features=0.9, min_samples_split=4, n_estimators=250, n_jobs=-1,
-           oob_score=True, random_state=42, warm_start=True)
+forest_reg = RandomForestRegressor(random_state=415, max_depth=18, max_features=6, min_samples_split=4, n_estimators=1800, n_jobs=-1,
+           oob_score=True)
 
 forest_reg.fit(input_data, output_data)
 forest_pred = forest_reg.predict(test_data)
@@ -149,9 +150,9 @@ forest_df.to_csv('./output2.csv', index_label='Id')
 ###########################################################################
 
 #################################### GRADIENT BOOSTING REGRESSOR - BEST CLASSIFIER ########################################
-input_data = input_data.drop(['atemp'], axis=1)
-test_data = test_data.drop(['atemp'], axis=1)
-grad_boost = GradientBoostingRegressor(n_estimators=12000,alpha=0.01, max_features=6, warm_start=True)
+# input_data = input_data.drop(['atemp'], axis=1)
+# test_data = test_data.drop(['atemp'], axis=1)
+grad_boost = GradientBoostingRegressor(n_estimators=8000,alpha=0.01, max_features=6, warm_start=True)
 
 grad_boost.fit(input_data, output_data)
 grad_pred = grad_boost.predict(test_data)
@@ -180,9 +181,9 @@ for i in range (len(grad_pred)):
     if grad_pred[i]/(grad_pred[i]+forest_pred[i]) > 0.2 and grad_pred[i]/(grad_pred[i]+forest_pred[i]) < 0.8:
         fresh.append((grad_pred[i]+forest_pred[i])/2)
     elif grad_pred[i]/(grad_pred[i]+forest_pred[i]) > 0.8:
-        fresh.append((grad_pred[i] + forest_pred[i])/2.4)
+        fresh.append((grad_pred[i] + forest_pred[i])/2.22)
     elif grad_pred[i]/(grad_pred[i]+forest_pred[i]) < 0.2:
-        fresh.append((grad_pred[i] + forest_pred[i]) / 1.6)
+        fresh.append((grad_pred[i] + forest_pred[i]) / 1.78)
     else:
         fresh.append(grad_pred[i])
 
